@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Box Addition</title>
+    <style>
+        .box {
+            border: 1px solid #000;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <button id="addButton">追加</button>
+    <div id="container"></div>
+    <script>
+        document.getElementById('addButton').addEventListener('click', function() {
+            addBox();
+            saveBoxes();
+        });
+
+        function addBox(kabe_name_value = '', buying_price_value = '', commission_value = '', selling_price_value = '', difference_value = '未算出') {
+            var newBox = document.createElement('div');
+            newBox.className = 'box';
+            
+            var newBox_line0 = document.createElement('div');
+            newBox_line0.style.display = "flex";
+            newBox.appendChild(newBox_line0);
+            
+            var newBox_line1 = document.createElement('div');
+            newBox_line1.style.display = "flex";
+            newBox.appendChild(newBox_line1);
+            
+            var newBox_line2 = document.createElement('div');
+            newBox_line2.style.display = "flex";
+            newBox.appendChild(newBox_line2);
+            
+            var kabe_name = document.createElement("input");
+            kabe_name.value = kabe_name_value;
+            newBox_line0.appendChild(kabe_name);
+            
+            var name1 = document.createElement("p");
+            name1.textContent = "買値";
+            newBox_line1.appendChild(name1);
+            
+            var buying_price = document.createElement('input');
+            buying_price.className = 'buying_price';
+            buying_price.value = buying_price_value;
+            newBox_line1.appendChild(buying_price);
+            
+            var name2 = document.createElement("p");
+            name2.textContent = "手数料";
+            newBox_line1.appendChild(name2);
+            
+            var commission = document.createElement('input');
+            commission.className = 'commission';
+            commission.value = commission_value;
+            newBox_line1.appendChild(commission);
+            
+            var name3 = document.createElement("p");
+            name3.textContent = "売値";
+            newBox_line2.appendChild(name3);
+            
+            var selling_price = document.createElement('input');
+            selling_price.className = 'selling_price';
+            selling_price.value = selling_price_value;
+            newBox_line2.appendChild(selling_price);
+            
+            var name4 = document.createElement("p");
+            name4.textContent = "利益";
+            newBox_line2.appendChild(name4);
+            
+            var difference = document.createElement("p");
+            difference.className = 'difference';
+            difference.textContent = difference_value;
+            newBox_line2.appendChild(difference);
+            
+            var button = document.createElement("button");
+            button.textContent = "算出";
+            newBox_line1.appendChild(button);
+            
+            document.getElementById('container').appendChild(newBox);
+
+            button.addEventListener('click', function() {
+                const num1 = parseFloat(buying_price.value) || 0;
+                const num2 = parseFloat(selling_price.value) || 0;
+                const num3 = parseFloat(commission.value) || 0;
+
+                const sum = num2 - num1 - num3;
+
+                difference.textContent = String(sum);
+                saveBoxes();
+            });
+        }
+
+        function saveBoxes() {
+            var boxes = [];
+            document.querySelectorAll('.box').forEach(function(box) {
+                var kabe_name = box.querySelector('input:nth-child(1)').value;
+                var buying_price = box.querySelector('.buying_price').value;
+                var commission = box.querySelector('.commission').value;
+                var selling_price = box.querySelector('.selling_price').value;
+                var difference = box.querySelector('.difference').textContent;
+
+                boxes.push({
+                    kabe_name: kabe_name,
+                    buying_price: buying_price,
+                    commission: commission,
+                    selling_price: selling_price,
+                    difference: difference
+                });
+            });
+            localStorage.setItem('boxes', JSON.stringify(boxes));
+        }
+
+        function loadBoxes() {
+            var boxes = JSON.parse(localStorage.getItem('boxes')) || [];
+            boxes.forEach(function(box) {
+                addBox(box.kabe_name, box.buying_price, box.commission, box.selling_price, box.difference);
+            });
+        }
+
+        window.addEventListener('load', loadBoxes);
+    </script>
+</body>
+</html>
